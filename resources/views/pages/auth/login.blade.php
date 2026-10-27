@@ -1,28 +1,37 @@
 <x-layouts::auth :title="__('Log in')">
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+    <div class="flex min-h-screen items-center justify-center bg-[#D2E7F5] px-4">
+    <!-- Card Container (Lebar max-md, sudut rounded-2xl, background abu-abu terang mirip gambar) -->
+    <div class="w-full max-w-md rounded-2xl bg-[#F4F4F5] p-8 shadow-md space-y-6">
+        
+        <!-- Logo / Brand Title (POLYTHRIFT) -->
+        <div class="text-center">
+            <h1 class="text-3xl font-black tracking-wider text-[#1E3A8A]">
+                POLY<span class="inline-block relative">Y</span>THRIFT
+            </h1>
+        </div>
 
         <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+        <x-auth-session-status class="text-center text-sm" :status="session('status')" />
 
-        <x-passkey-verify />
-
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
+        <!-- Form Login -->
+        <form method="POST" action="{{ route('login.store') }}" class="space-y-4">
             @csrf
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
-                type="email"
-                required
-                autofocus
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
+            <!-- Email / User ID -->
+            <div>
+                <flux:input
+                    name="email"
+                    :label="__('Email / User ID')"
+                    :value="old('email')"
+                    type="text"
+                    required
+                    autofocus
+                    autocomplete="email"
+                    placeholder="nama@email.com atau username"
+                />
+            </div>
 
-            <!-- Password -->
+            <!-- Password & Forgot Password Link -->
             <div class="relative">
                 <flux:input
                     name="password"
@@ -33,27 +42,33 @@
                     :placeholder="__('Password')"
                     viewable
                 />
+            </div>
+
+            <div class="flex items-center justify-between text-xs pt-1">
+                <!-- Remember Me -->
+                <flux:checkbox name="remember" :label="__('Ingat saya')" :checked="old('remember')" />
 
                 @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
+                    <flux:link class="text-[#1145A6] hover:underline text-xs" :href="route('password.request')" wire:navigate>
+                        {{ __('Lupa Kata Sandi') }}
                     </flux:link>
                 @endif
             </div>
 
-            <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
-
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
+            <!-- Tombol Masuk (Warna Biru Tua Custom ala Poly Thrift) -->
+            <div class="pt-2">
+                <button type="submit" 
+                    class="w-full rounded-md bg-[#1145A6] py-2.5 text-center text-sm font-semibold text-white shadow hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-all"
+                    data-test="login-button">
+                    {{ __('Masuk') }}
+                </button>
             </div>
         </form>
 
-        <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-            <span>{{ __('Don\'t have an account?') }}</span>
-            <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
+        <!-- Buat Akun Baru Link -->
+        <div class="text-center text-xs pt-2">
+            <span class="text-gray-600">{{ __('Buat akun baru?') }}</span>
+            <flux:link class="text-[#1145A6] font-semibold hover:underline ms-1" :href="route('register')" wire:navigate>{{ __('Buat Akun Baru') }}</flux:link>
         </div>
     </div>
-</x-layouts::auth>
+</div>
