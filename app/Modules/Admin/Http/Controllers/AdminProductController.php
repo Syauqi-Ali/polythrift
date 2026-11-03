@@ -10,7 +10,6 @@ class AdminProductController extends Controller
 {
     public function index(Request $request)
     {
-        // Menampilkan produk khusus untuk tenant/toko yang sedang login
         $products = Product::where('store_id', $request->user()->store_id)->latest()->get();
         
         return view('admin.products.index', compact('products'));
@@ -31,7 +30,6 @@ class AdminProductController extends Controller
         'status' => 'required|string|max:50',
     ]);
 
-    // Otomatis menetapkan store_id dari user yang login
     $validated['store_id'] = $request->user()->store_id;
 
     Product::create($validated);
@@ -41,7 +39,6 @@ class AdminProductController extends Controller
 
     public function edit(Request $request, Product $product)
     {
-        // Pastikan tenant hanya bisa mengedit produk miliknya sendiri
         if ($product->store_id !== $request->user()->store_id) {
             abort(403, 'Unauthorized action.');
         }

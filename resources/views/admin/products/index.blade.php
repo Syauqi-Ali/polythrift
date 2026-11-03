@@ -1,9 +1,7 @@
 @component('layouts.app')
-    {{-- Mengirim variabel $title ke layout --}}
     @slot('title', 'Daftar Produk Thrift')
 
     <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Header & Tombol Tambah -->
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold text-white-800">Daftar Produk Thrift</h2>
             
@@ -14,14 +12,12 @@
             @endcan
         </div>
 
-        <!-- Alert Success -->
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm" role="alert">
                 <span class="block sm:inline">{{ session('success') }}</span>
             </div>
         @endif
 
-        <!-- Tabel Produk -->
         <div class="bg-white shadow-sm overflow-hidden sm:rounded-xl border border-gray-200">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
