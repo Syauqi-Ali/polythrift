@@ -17,5 +17,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 
 
+Route::middleware(['auth', 'role:admin|seller'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('products', AdminProductController::class);
+});
+
 
 require __DIR__.'/settings.php';

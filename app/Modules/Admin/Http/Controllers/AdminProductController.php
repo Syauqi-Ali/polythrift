@@ -8,45 +8,74 @@ use App\Models\Product;
 
 class AdminProductController extends Controller
 {
-    public function edit($id)
+    public function index(Request $request)
     {
-        /** @var \App\Models\User $user */
-        $user = request()->user();
-        $product = Product::where('id', $id)
-                        ->where('store_id', $user->store_id)
-                        ->firstOrFail();
+        // Menampilkan produk khusus untuk tenant/toko yang sedang login
+        $products = Product::where('store_id', $request->user()->store_id)->latest()->get();
+        
+        return view('admin.products.index', compact('products'));
+    }
+
+    public function create()
+    {
+        return view('admin.products.create');
+    }
+
+    public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'size' => 'required|string|max:50',
+        'condition' => 'required|string|max:100',
+        'price' => 'required|numeric',
+        'status' => 'required|string|max:50',
+    ]);
+
+    // Otomatis menetapkan store_id dari user yang login
+    $validated['store_id'] = $request->user()->store_id;
+
+    Product::create($validated);
+
+    return redirect()->route('admin.products.index')->with('success', 'Produk berhasil ditambahkan.');
+}
+
+    public function edit(Request $request, Product $product)
+    {
+        // Pastikan tenant hanya bisa mengedit produk miliknya sendiri
+        if ($product->store_id !== $request->user()->store_id) {
+            abort(403, 'Unauthorized action.');
+        }
 
         return view('admin.products.edit', compact('product'));
     }
 
-    public function update(Request $request, $id)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0,',
-        ]);
-
-        /** @var \App\Models\User $user */
-        $user = request()->user();
-        $product = Product::where('id', $id)
-                        ->where('store_id', $user->store_id)
-                        ->firstOrFail();
-
-        $product->update($validatedData);
-
-        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
+    public function update(Request $request, Product $product)
+{
+    if ($product->store_id !== $request->user()->store_id) {
+        abort(403);
     }
 
-    public function destroy($id)
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'size' => 'required|string|max:50',
+        'condition' => 'required|string|max:100',
+        'price' => 'required|numeric',
+        'status' => 'required|string|max:50',
+    ]);
+
+    $product->update($validated);
+
+    return redirect()->route('admin.products.index')->with('success', 'Produk berhasil diperbarui.');
+}
+
+    public function destroy(Request $request, Product $product)
     {
-        /** @var \App\Models\User $user */
-        $user = request()->user();
-        $product = Product::where('id', $id)
-                        ->where('store_id', $user->store_id)
-                        ->firstOrFail();
+        if ($product->store_id !== $request->user()->store_id) {
+            abort(403);
+        }
 
         $product->delete();
 
-        return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
+        return redirect()->route('admin.products.index')->with('success', 'Produk berhasil dihapus.');
     }
 }
