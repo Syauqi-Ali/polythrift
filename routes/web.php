@@ -10,16 +10,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::resource('products', AdminProductController::class);
-    Route::resource('stores', AdminStoreController::class);
-});
-
-
-
-Route::middleware(['auth', 'role:admin|seller'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:Super Admin|seller'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', AdminProductController::class);
 });
-
 
 require __DIR__.'/settings.php';

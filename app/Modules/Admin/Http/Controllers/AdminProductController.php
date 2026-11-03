@@ -5,16 +5,28 @@ namespace App\Modules\Admin\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminProductController extends Controller
 {
-    public function index(Request $request)
-    {
-        $products = Product::where('store_id', $request->user()->store_id)->latest()->get();
-        
-        return view('admin.products.index', compact('products'));
+public function index()
+{
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
+
+    if ($user->hasRole('Super Admin')) {
+        $products = Product::latest()->get();
+    } else {
+        $store = \App\Models\Store::where('user_id', $user->id)->first();
+
+        $products = $store 
+            ? Product::where('store_id', $store->id)->latest()->get() 
+            : collect();
     }
 
+    return view('admin.products.index', compact('products'));
+}
     public function create()
     {
         return view('admin.products.create');
