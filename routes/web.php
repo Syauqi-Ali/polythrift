@@ -18,12 +18,8 @@ Route::middleware(['auth'])->group(function () {
     Route::view('/categories', 'categories')->name('categories');
 });
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin|seller'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', AdminProductController::class);
-    Route::resource('stores', AdminStoreController::class);
 });
-
-
-
 
 require __DIR__.'/settings.php';

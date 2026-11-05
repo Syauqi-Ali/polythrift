@@ -21,11 +21,11 @@ class ProductFactory extends Factory
         return [
             'store_id' => Store::factory(),
             'name' => $this->faker->word(),
-            'slug' => $this->faker->unique()->slug(),
-            'description' => $this->faker->paragraph(),
+            'size' => $this->faker->randomElement(['M', 'L', 'XL', 'XXL']),
+            'condition' => $this->faker->text(30),
             'price' => $this->faker->randomFloat(2, 1, 100),
             'stock' => $this->faker->numberBetween(0, 100),
-            'status' => $this->faker->randomElement(['available', 'unavailable']),
+            'status' => $this->faker->randomElement(['available', 'sold', 'hidden']),
         ];
     }
 }
