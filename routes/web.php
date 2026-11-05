@@ -10,7 +10,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });
 
-Route::middleware(['auth', 'role:Super Admin|seller'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin|seller'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', AdminProductController::class);
 });
 
