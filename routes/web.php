@@ -1,54 +1,52 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PayoutController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SellerController;
+use App\Http\Controllers\SellerDashboardController;
+use App\Http\Controllers\StoreRegistrationController;
 use Illuminate\Support\Facades\Route;
-use App\Modules\Admin\Http\Controllers\AdminProductController;
-use App\Modules\Admin\Http\Controllers\AdminStoreController;
 
-// Route::view('/', 'welcome')->name('home');
-
-// Route::middleware(['auth'])->group(function () {
-//     Route::view('/dashboard', 'dashboard')->name('dashboard');
-
-//     Route::view('/products', 'products')->name('products');
-
-//     Route::view('/orders', 'orders')->name('orders');
-
-//     Route::view('/add-product', 'add-product')->name('add-product');
-
-//     Route::view('/categories', 'categories')->name('categories');
-// });
-
-// Route::middleware(['auth', 'role:admin|seller'])->prefix('admin')->name('admin.')->group(function () {
-//     Route::resource('products', AdminProductController::class);
-// });
-
-// require __DIR__.'/settings.php';
-
-
-
-Route::get('/', 'ProductController@index')->name('home');
-Route::get('/products/{slug}', 'ProductController@show')->name('products.show');
+Route::get('/', [ProductController::class, 'index'])->name('home');
+Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/checkout', 'CheckoutController@store')->name('checkout.store');
-    Route::post('/payments/{id}/confirm', 'PaymentController@confirmPayment')->name('payments.confirm');
-    Route::post('/stores/register', 'StoreRegistrationController@register')->name('stores.register');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('/payments/{id}/confirm', [PaymentController::class, 'confirmPayment'])->name('payments.confirm');
+    Route::post('/stores/register', [StoreRegistrationController::class, 'register'])->name('stores.register');
 });
 
-Route::middleware(['auth', 'role:seller'])->group(function () {
-    Route::prefix('/seller')->group(function () {
-        Route::get('/dashboard', 'SellerDashboardController@index')->name('seller.dashboard');
-        Route::resource('/products', 'ProductController');
-        Route::get('/balance', 'SellerController@balance')->name('seller.balance');
-        Route::post('/payouts/request', 'PayoutController@requestPayout')->name('seller.payouts.request');
-    });
+Route::middleware(['auth', 'role:seller'])->prefix('/seller')->group(function () {
+    Route::get('/dashboard', [SellerDashboardController::class, 'index'])->name('seller.dashboard');
+    Route::resource('/products', ProductController::class)->names('seller.products');
+    Route::get('/balance', [SellerController::class, 'balance'])->name('seller.balance');
+    Route::post('/payouts/request', [PayoutController::class, 'requestPayout'])->name('seller.payouts.request');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::prefix('/admin')->group(function () {
-        Route::get('/dashboard', 'AdminDashboardController@index')->name('admin.dashboard');
-        Route::post('/payments/{id}/verify', 'PaymentController@verifyPayment')->name('admin.payments.verify');
-        Route::post('/payouts/{id}/approve', 'PayoutController@approvePayout')->name('admin.payouts.approve');
-        Route::post('/payouts/{id}/reject', 'PayoutController@rejectPayout')->name('admin.payouts.reject');
-    });
+Route::middleware(['auth', 'role:admin'])->prefix('/admin')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::post('/payments/{id}/verify', [PaymentController::class, 'verifyPayment'])->name('admin.payments.verify');
+    Route::post('/payouts/{id}/approve', [PayoutController::class, 'approvePayout'])->name('admin.payouts.approve');
+    Route::post('/payouts/{id}/reject', [PayoutController::class, 'rejectPayout'])->name('admin.payouts.reject');
 });
+
+Route::view('/dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::redirect('/settings', '/settings/profile');
+
+    Route::livewire('/settings/profile', 'pages::settings.profile')->name('profile.edit');
+    Route::livewire('/settings/security', 'pages::settings.security')->name('security.edit');
+    Route::livewire('/settings/appearance', 'pages::settings.appearance')->name('appearance.edit');
+});
+
+Route::view('/dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+require __DIR__.'/settings.php';

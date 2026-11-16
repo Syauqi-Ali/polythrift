@@ -3,10 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\Store;
-use App\Models\OrderItem;
-use App\Models\Payment;
 
 class Order extends Model
 {
@@ -20,7 +16,7 @@ class Order extends Model
         'seller_amount',
         'status_order',
     ];
-    
+
     public function buyer()
     {
         return $this->belongsTo(User::class, 'buyer_id');

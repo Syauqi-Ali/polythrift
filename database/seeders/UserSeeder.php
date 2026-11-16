@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 
@@ -20,17 +19,17 @@ class UserSeeder extends Seeder
 
         $admin = User::factory()->create([
             'name' => 'Super Admin',
-            'email' => 'admin@gmail.com'
+            'email' => 'admin@gmail.com',
         ])->assignRole($adminRole);
 
         $store = User::factory()->create([
             'name' => 'Store',
-            'email' => 'store@gmail.com'
+            'email' => 'store@gmail.com',
         ])->assignRole($storeRole);
 
         $customer = User::factory()->create([
             'name' => 'Customer',
-            'email' => 'customer@gmail.com'
+            'email' => 'customer@gmail.com',
         ])->assignRole($customerRole);
 
         User::factory(9)->create()->each(function ($user) use ($customerRole) {

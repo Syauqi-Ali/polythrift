@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('condition', 50);
             $table->decimal('price', 12, 2);
             $table->string('image', 255)->nullable();
-            $table->enum('status', ['available', 'sold', 'hidden'])->default('available');
+            $table->enum('status', ['available', 'reserved', 'sold'])->default('available');
             $table->timestamps();
         });
     }

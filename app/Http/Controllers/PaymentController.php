@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
 use App\Models\Order;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Spatie\Permission\Models\Role;
+use App\Models\Payment;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -21,13 +19,15 @@ class PaymentController extends Controller
 
         try {
             DB::transaction(function () use ($request, $paymentId) {
-                $payment = Payment::where('id', $paymentId)->lockForUpdate()->first();
-                $order = Order::where('id', $payment->order_id)->lockForUpdate()->first();
-                $user = $order->buyer;
-                $store = $order->store;
+                $payment = Payment::where('id', $paymentId)->lockForUpdate()->firstOrFail();
+                $order = Order::where('id', $payment->order_id)->lockForUpdate()->firstOrFail();
 
-                // Simpan berkas bukti transfer ke storage
+                if ($order->buyer_id !== Auth::id()) {
+                    throw new Exception('Anda tidak berhak mengonfirmasi pembayaran ini.');
+                }
+
                 $path = $request->file('proof')->store('payments/proofs', 'public');
+
                 $payment->update([
                     'proof' => $path,
                     'status' => 'pending_verification',
@@ -40,21 +40,20 @@ class PaymentController extends Controller
             });
 
             return response()->json(['message' => 'Pembayaran dikonfirmasi'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 
     public function verifyPayment(Request $request, $paymentId)
     {
         try {
-            DB::transaction(function () use ($request, $paymentId) {
-                $payment = Payment::where('id', $paymentId)->lockForUpdate()->first();
-                $order = Order::where('id', $payment->order_id)->lockForUpdate()->first();
+            DB::transaction(function () use ($paymentId) {
+                $payment = Payment::where('id', $paymentId)->lockForUpdate()->firstOrFail();
+                $order = Order::where('id', $payment->order_id)->lockForUpdate()->firstOrFail();
                 $store = $order->store;
-                $user = Auth::user();
 
-                if ($payment->status != 'pending_verification') {
+                if ($payment->status !== 'pending_verification') {
                     throw new Exception('Pembayaran tidak bisa diverifikasi karena statusnya bukan pending verification');
                 }
 
@@ -66,34 +65,12 @@ class PaymentController extends Controller
                     'status_order' => 'processing',
                 ]);
 
-                // Penambahan Saldo Tenant
                 $store->increment('balance', $order->seller_amount);
             });
 
-            return response()->json(['message' => 'Penarikan disetujui'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
-        }
-    }
-
-    public function rejectPayout(Request $request, $payoutId)
-    {
-        try {
-            DB::transaction(function () use ($request, $payoutId) {
-                $payout = Payout::where('id', $payoutId)->lockForUpdate()->first();
-                $store = Store::where('id', $payout->store_id)->lockForUpdate()->first();
-
-                $store->increment('balance', $payout->amount);
-
-                $payout->update([
-                    'status' => 'rejected',
-                    'processed_at' => now(),
-                ]);
-            });
-
-            return response()->json(['message' => 'Penarikan ditolak'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Pembayaran berhasil diverifikasi'], 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
         }
     }
 }

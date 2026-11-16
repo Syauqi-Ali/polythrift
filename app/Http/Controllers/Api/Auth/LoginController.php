@@ -16,14 +16,15 @@ class LoginController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $user = User::where("email", $request->email)->first();
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        $user = User::where('email', $request->email)->first();
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['User atau password anda salah.'],
             ]);
         }
 
         $token = $user->createToken('laravel_api_token')->plainTextToken;
+
         return response()->json([
             'token' => $token,
             'user' => $user,

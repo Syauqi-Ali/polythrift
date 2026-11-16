@@ -3,12 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Store;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
-use Exception;
 
 class StoreRegistrationController extends Controller
 {
@@ -33,13 +32,13 @@ class StoreRegistrationController extends Controller
                 ]);
 
                 $role = Role::findByName('seller');
-                if (!$user->assignRole($role)) {
+                if (! $user->assignRole($role)) {
                     throw new Exception('Gagal menambahkan role "seller"');
                 }
             });
 
             return response()->json(['message' => 'Pendaftaran toko berhasil'], 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

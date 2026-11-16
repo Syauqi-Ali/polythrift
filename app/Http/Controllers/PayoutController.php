@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Payout;
 use App\Models\Store;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Exception;
 
 class PayoutController extends Controller
 {
@@ -62,7 +62,7 @@ class PayoutController extends Controller
 
     public function rejectPayout(Request $request, $payoutId)
     {
-        DB::transaction(function () use ($request, $payoutId) {
+        DB::transaction(function () use ($payoutId) {
             $payout = Payout::where('id', $payoutId)->lockForUpdate()->firstOrFail();
             $store = Store::where('id', $payout->store_id)->lockForUpdate()->firstOrFail();
 

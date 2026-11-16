@@ -1,8 +1,11 @@
 <?php
+
 use App\Modules\Admin\AdminServiceProvider;
+use App\Providers\AppServiceProvider;
+use App\Providers\FortifyServiceProvider;
 
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\FortifyServiceProvider::class,
+    AppServiceProvider::class,
+    FortifyServiceProvider::class,
     AdminServiceProvider::class,
 ];

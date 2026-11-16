@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
-            $table->string('proof');
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
-            $table->date('payment_date');
+            $table->string('proof')->nullable();
+            $table->enum('status', ['unpaid', 'pending_verification', 'paid', 'rejected'])->default('unpaid');
+            $table->date('payment_date')->nullable();
             $table->timestamps();
         });
     }

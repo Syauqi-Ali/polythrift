@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('store_id')->constrained('stores')->onDelete('cascade');
             $table->decimal('price', 12, 2);
             $table->decimal('ongkir', 10, 2)->default(0);
-            $table->enum('status_order', ['pending', 'paid', 'shipped', 'completed', 'cancelled'])->default('pending');
+            $table->enum('status_order', ['pending', 'waiting_confirmation', 'processing', 'shipped', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }
