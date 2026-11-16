@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Order;
 
-
-#[Fillable(['order_id', 'payment_method', 'payment_status', 'payment_proof'])]
 class Payment extends Model
 {
-    /** @use HasFactory<\Database\Factories\PaymentFactory> */
-    use HasFactory;
+    protected $fillable = [
+        'order_id',
+        'proof',
+        'status',
+        'payment_date',
+    ];
 
     public function order()
     {
-        return $this->belongsTo(Order::class, 'order_id');
+        return $this->belongsTo(Order::class);
     }
 }

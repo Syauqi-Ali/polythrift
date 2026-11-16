@@ -2,19 +2,30 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Store;
+use App\Models\OrderItem;
 
-
-#[Fillable(['name', 'description', 'price', 'stock', 'store_id'])]
 class Product extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductFactory> */
-    use HasFactory;
+    protected $fillable = [
+        'store_id',
+        'name',
+        'slug',
+        'description',
+        'price',
+        'size',
+        'condition',
+        'status',
+    ];
 
     public function store()
     {
-        return $this->belongsTo(Store::class, 'store_id');
+        return $this->belongsTo(Store::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }
