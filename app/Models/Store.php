@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['user_id', 'name', 'slug', 'description', 'status'])]
 class Store extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'user_id',
         'name',
