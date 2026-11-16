@@ -1,6 +1,5 @@
 <?php
 
-// app/Http/Controllers/StoreRegistrationController.php
 namespace App\Http\Controllers;
 
 use App\Models\Store;
@@ -20,24 +19,28 @@ class StoreRegistrationController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        DB::transaction(function () use ($request) {
-            $user = auth()->user();
+        try {
+            DB::transaction(function () use ($request) {
+                $user = auth()->user();
 
-            $store = Store::create([
-                'user_id' => $user->id,
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'description' => $request->description,
-                'status' => 'active',
-                'balance' => 0,
-            ]);
+                $store = Store::create([
+                    'user_id' => $user->id,
+                    'name' => $request->name,
+                    'slug' => Str::slug($request->name),
+                    'description' => $request->description,
+                    'status' => 'active',
+                    'balance' => 0,
+                ]);
 
-            $role = Role::findByName('seller');
-            if (!$user->assignRole($role)) {
-                throw new Exception('Gagal menambahkan role "seller"');
-            }
-        });
+                $role = Role::findByName('seller');
+                if (!$user->assignRole($role)) {
+                    throw new Exception('Gagal menambahkan role "seller"');
+                }
+            });
 
-        return response()->json(['message' => 'Pendaftaran toko berhasil'], 201);
+            return response()->json(['message' => 'Pendaftaran toko berhasil'], 201);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }
