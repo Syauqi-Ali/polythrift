@@ -13,7 +13,8 @@ class ProductController extends Controller
             ->latest()
             ->paginate(12);
 
-        return view('products.index', compact('products'));
+        return view('welcome', compact('products'));
+        // return view('products.index', compact('products'));
     }
 
     public function show($slug)
