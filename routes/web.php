@@ -19,7 +19,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/stores/register', [StoreRegistrationController::class, 'register'])->name('stores.register');
 });
 
-Route::middleware(['auth', 'role:seller'])->prefix('/seller')->group(function () {
+Route::middleware(['auth', 'role:store'])->prefix('/store')->group(function () {
     Route::get('/dashboard', [SellerDashboardController::class, 'index'])->name('seller.dashboard');
     Route::resource('/products', ProductController::class)->names('seller.products');
     Route::get('/balance', [SellerController::class, 'balance'])->name('seller.balance');
